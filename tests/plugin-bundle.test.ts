@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { randomUUID } from 'node:crypto';
 import { execFile } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
 import { test } from 'node:test';
@@ -25,7 +26,15 @@ test('production plugin bundle passes sandbox source checks and starts without b
   const shown: string[] = [];
   const messages: unknown[] = [];
   const events: string[] = [];
+  let storedPairing: unknown;
+  let storageWrites = 0;
   const api = {
+    pluginId: 'test-plugin',
+    clientStorage: {
+      getAsync: async () => storedPairing,
+      setAsync: async (_key: string, value: unknown) => { storageWrites++; storedPairing = value; },
+      deleteAsync: async () => { storedPairing = undefined; }
+    },
     root: { name: 'Bundle validation' },
     get fileKey(): never { throw new Error('private API unavailable'); },
     currentPage: { id: 'page', name: 'Page 1', selection: [] },
@@ -63,4 +72,18 @@ test('production plugin bundle passes sandbox source checks and starts without b
       name: 'Bundle validation', fileKey: null, pageId: 'page', pageName: 'Page 1', selection: [], selectionCount: 0
     }
   }]);
+  const token = 'c'.repeat(64);
+  const sendPairing = async (action: string, extra = {}) => {
+    const requestId = randomUUID();
+    api.ui.onmessage!({ type: 'pairing', requestId, action, ...extra });
+    await new Promise(resolve => setImmediate(resolve));
+    return JSON.parse(JSON.stringify(messages[messages.length - 1]));
+  };
+  api.ui.onmessage!({ type: 'pairing', requestId: randomUUID(), action: 'save', token: 'invalid' });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(storageWrites, 0);
+  assert.equal((await sendPairing('save', { token })).ok, true);
+  assert.equal((await sendPairing('load')).token, token);
+  assert.equal((await sendPairing('forget')).ok, true);
+  assert.equal((await sendPairing('load')).token, null);
 });

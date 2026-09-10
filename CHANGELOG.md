@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Optional remembered pairing reconnects after reopening the plugin, with explicit Forget and authentication-rejection cleanup.
+- Local Figma development-ID configuration enables plugin-scoped storage without committing a user's registration to Git.
+
 ## 1.0.0 — Initial release
 
 - Local authenticated bridge and stdio MCP server for a custom Figma Design development plugin.

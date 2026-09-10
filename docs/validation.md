@@ -2,6 +2,14 @@
 
 Validation date: **2026-09-10**, macOS. This record covers the original live implementation and preparation for source distribution; it is not a claim that a fresh checkout is already installed or connected. Run the commands below to validate your environment. Generated reports, screenshots, credentials and exported design files are intentionally excluded from the repository.
 
+## Remembered pairing verification
+
+The remembered-pairing update passed **66 automated tests**, typechecking and production builds. Regression coverage includes storage failures, malformed control messages, stale load/save responses, ordered save/delete operations, forgotten credentials, authentication rejection and registration configuration that preserves network restrictions.
+
+The original ID-less development plugin could not load Figma client storage. A development ID obtained through Figma's New plugin flow was saved in ignored local configuration and applied only to the built manifest. Pairing was saved successfully. Figma was then fully quit and relaunched; after opening the registered connector build, it connected using the saved key without another entry. The actual MCP tools read the existing frame and text and exported a correct PNG after the restart. Remember was left enabled on the tested computer. The temporary generated template's local development entry was removed; its source files remained local.
+
+The stable ID is a one-time prerequisite for Remember. It is not included in the public source, and does not publish the plugin to Figma Community. New installations must complete the README registration steps to use persistent pairing. Figma's local storage is not an encrypted keychain.
+
 ## Source distribution checks
 
 A clean export containing only the files intended for Git was installed with `npm ci` in a directory whose name contained spaces. `npm run check` passed all **53 tests**, typechecking and production builds. Generated Codex configuration parsed as TOML and resolved that export's actual Node executable and MCP entry point. The generated plugin's project and Zod license files matched their sources.
@@ -30,11 +38,11 @@ This does not verify Figma login, Figma canvas controls, desktop/browser documen
 
 ## Compiled pairing UI
 
-`npm run smoke:ui` passed with the actual built UI JavaScript in a Chrome iframe using only `sandbox="allow-scripts"` and the production bridge origin policy. The parent emulates schema-valid Figma messages; the WebSocket bridge is real. Verified Enter-key pairing, invalid-token rejection, selection request forwarding, automatic bridge-restart reconnect, manual reconnect, disconnect cleanup, and absence of pairing keys from URLs, browser storage and parent messages.
+`npm run smoke:ui` passed with the actual built UI JavaScript in a Chrome iframe using only `sandbox="allow-scripts"` and the production bridge origin policy. The parent emulates schema-valid Figma messages and local storage; the WebSocket bridge is real. Fifteen checks verify pairing, selection forwarding, reconnect, persistence across UI runtimes, Disconnect/resume, unchecking Remember, Forget, and invalid saved credentials. Without Remember, no key crosses the parent channel; with it enabled, keys cross only the typed save channel. URLs and browser storage remain free of pairing keys.
 
 This check found and drove fixes for two build/runtime defects: replacement-string expansion corrupting bundled JavaScript during HTML embedding, and the Connect action depending on form-submission permission. The build now parses its embedded script before delivery, and Connect works through explicit click/Enter handling.
 
-Evidence: `artifacts/plugin-ui-smoke/result.json` and seven state screenshots. The 320×380 connected and long-error layouts were visually inspected and fit the panel. At 280px width, content has no horizontal overflow; the deliberately long error is vertically scrollable. No browser runtime errors occurred. This is still a simulated parent, **not the real Figma iframe**.
+Evidence: `artifacts/plugin-ui-smoke/result.json` and state screenshots. The remembered-pairing panel was visually inspected at 320×470. At 280px width, content has no horizontal overflow; the deliberately long error is vertically scrollable. No browser runtime errors occurred. This is still a simulated parent; real Figma persistence was verified separately above.
 
 ## Live Figma: passed
 
@@ -50,7 +58,7 @@ The runner writes `artifacts/live-smoke-<timestamp>.json`, including arguments, 
 
 The actual 440×240 PNG was visually inspected: the pale green frame and dark `Connected locally` text rendered correctly, with the text placed at the expected 24px inset.
 
-After the original 48-test build and another passing compiled-UI smoke, actual Desktop Reconnect replaced the session while preserving the plugin instance, Disconnect removed it, and fresh pairing restored selection and node reads through the built stdio MCP server. The frame and text remained intact. Rebuilding a development plugin reloads its panel and requires pairing again; a bridge-only restart is handled by automatic reconnection.
+After the original 48-test build and another passing compiled-UI smoke, actual Desktop Reconnect replaced the session while preserving the plugin instance, Disconnect removed it, and fresh pairing restored selection and node reads through the built stdio MCP server. The frame and text remained intact. Rebuilding reloads the plugin panel; saved pairing now restores automatically when Remember is enabled and the development ID is retained. A bridge-only restart is handled by automatic reconnection.
 
 Actual Desktop execution exposed and resolved compatibility issues that simulated peers could not establish:
 

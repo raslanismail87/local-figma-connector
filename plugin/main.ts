@@ -4,8 +4,12 @@ import { readNodes } from './read.js';
 import { exportNodes } from './export.js';
 import { mutate } from './mutations.js';
 import { boundedResponse } from './wire-size.js';
+import { pairingRequestSchema } from './pairing-protocol.js';
+import { PairingStorage } from './pairing-storage.js';
 
-figma.showUI(__html__, { width: 320, height: 380, themeColors: true });
+figma.showUI(__html__, { width: 320, height: 470, themeColors: true });
+
+const pairingStorage = new PairingStorage(figma.clientStorage, figma.pluginId);
 
 const mutationIds = new Set<string>();
 let queue: Promise<void> = Promise.resolve();
@@ -47,6 +51,11 @@ async function execute(request: PluginRequest): Promise<Response> {
 figma.ui.onmessage = (message: unknown) => {
   if (typeof message === 'object' && message !== null && 'type' in message && message.type === 'ready') {
     publishDocument();
+    return;
+  }
+  const pairing = pairingRequestSchema.safeParse(message);
+  if (pairing.success) {
+    void pairingStorage.handle(pairing.data).then(result => figma.ui.postMessage(result)).catch(() => {});
     return;
   }
   const parsed = requestSchema.safeParse(message);

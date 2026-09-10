@@ -15,6 +15,10 @@
     input { width: 100%; height: 34px; border: 1px solid var(--figma-color-border, #ccc); border-radius: 4px; background: var(--figma-color-bg, #fff); color: inherit; padding: 0 9px; font: inherit; }
     input:focus-visible, button:focus-visible { outline: 2px solid var(--figma-color-border-brand-strong, #0d78e8); outline-offset: 2px; }
     .hint { font-size: 11px; margin-top: 6px; }
+    .remember { display: flex; gap: 7px; align-items: flex-start; margin-top: 12px; font-size: 11px; }
+    .remember input { width: 14px; height: 14px; padding: 0; margin: 1px 0 0; flex: 0 0 14px; }
+    #forget { height: 26px; padding: 0 8px; margin-bottom: 12px; font-size: 11px; }
+    #pairing-status { min-height: 33px; }
     .actions { display: flex; gap: 8px; margin: 16px 0; }
     button { height: 32px; border: 1px solid var(--figma-color-border, #ccc); border-radius: 4px; padding: 0 13px; background: var(--figma-color-bg, #fff); color: inherit; font: 500 12px Inter, system-ui, sans-serif; cursor: pointer; }
     button.primary { background: var(--figma-color-bg-brand, #0d78e8); border-color: transparent; color: var(--figma-color-text-onbrand, #fff); }
@@ -33,11 +37,14 @@
   <form id="connection-form">
     <label for="token">Pairing token</label>
     <input id="token" type="password" autocomplete="off" spellcheck="false" placeholder="Paste the token from npm run pair" aria-describedby="token-hint">
-    <p class="hint" id="token-hint">Kept only while this plugin is open.</p>
+    <p class="hint" id="token-hint">Use Remember to reconnect when you reopen this plugin.</p>
+    <label class="remember"><input id="remember" type="checkbox">Remember pairing on this computer</label>
+    <p class="hint" id="pairing-status" role="status">Stored locally in Figma when enabled.</p>
     <div class="actions">
       <button class="primary" id="connect" type="button">Connect</button>
       <button id="disconnect" type="button" disabled>Disconnect</button>
     </div>
+    <button id="forget" type="button" disabled>Forget pairing</button>
   </form>
   <div class="connection" role="status" aria-live="polite">
     <div class="status-line"><span id="dot" aria-hidden="true"></span><span id="status">Disconnected</span></div>

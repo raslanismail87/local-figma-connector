@@ -31,7 +31,27 @@ Keep the bridge terminal running. It listens only on `127.0.0.1:3845`. Setup cre
 
 The built manifest imports without a publishing ID in the tested Figma Desktop 126.8.18. Its development WebSocket address is `ws://localhost:3845`; retain that hostname in both the manifest and plugin UI. The bridge itself binds only to `127.0.0.1`.
 
-`npm run pair` uses `pbcopy` on macOS, PowerShell on Windows, or `wl-copy`/`xclip`/`xsel` on Linux. Install the appropriate Linux utility or use the private token file manually if unavailable. It places a secret on the clipboard; replace the clipboard contents after pairing. The plugin keeps the key only in memory while connected and clears it on Disconnect or pairing rejection. It does not use URLs or client storage for credentials.
+`npm run pair` uses `pbcopy` on macOS, PowerShell on Windows, or `wl-copy`/`xclip`/`xsel` on Linux. Install the appropriate Linux utility or use the private token file manually if unavailable. It places a secret on the clipboard; replace the clipboard contents after pairing. By default, the key stays in memory only while the plugin is open. Disconnect pauses the connection; Connect resumes using the in-memory key. Forget pairing clears the key and disconnects.
+
+### Remember pairing
+
+Enable **Remember pairing on this computer** to reconnect without pasting a key whenever you reopen the plugin, including after restarting Figma. The bridge must still be running, and you must reopen the plugin; this does not launch plugins automatically when Figma starts.
+
+Figma requires a stable development plugin ID for its local storage. If the panel reports that an ID is required, complete this one-time setup:
+
+1. In Figma Desktop, choose **Plugins → Development → New plugin**, select **Figma design** and **Custom UI**, and save the generated files in a local folder. You can use this checkout's ignored `.local/` directory.
+2. Import the Figma-assigned ID into this checkout, then rebuild:
+
+   ```sh
+   npm run plugin:configure -- "/path/to/generated/manifest.json"
+   npm run build
+   ```
+
+3. Import this checkout's `dist/plugin/manifest.json` in Figma. Run it, enter the key once, enable Remember, and connect. Wait for the panel to confirm that pairing was saved.
+
+Only the ID is copied into `.local/figma-plugin.json`, which is excluded from Git. The connector's document and network permissions are preserved. Keep that ID stable: changing it makes the previous plugin storage inaccessible.
+
+Remembering saves the key in Figma's local, plugin-scoped `clientStorage`. It is not stored in the design file or synchronized with other users, and it is not an encrypted keychain. Unchecking Remember removes the saved key while keeping the current connection. **Forget pairing** removes both the saved and in-memory key and disconnects. Rejected credentials are removed; storage failures are reported rather than claiming success. [Figma storage documentation](https://developers.figma.com/docs/plugins/api/figma-clientStorage/).
 
 ### Connect Codex
 

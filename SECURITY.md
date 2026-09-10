@@ -2,7 +2,9 @@
 
 The connector is intended for one user's local machine. The bridge binds to IPv4 loopback and requires a shared pairing key. Possession of that key grants control of connected Figma documents within the supported tool contract. Only run and pair plugin code you trust.
 
-The plugin keeps the key in memory and clears it on disconnect or pairing rejection. `npm run pair` copies it to the system clipboard; replace clipboard contents afterward. The bridge stores credentials, exported assets and mutation history in a private local state directory. On Windows, protect that directory with appropriate account filesystem permissions; Unix file modes do not establish Windows ACL protection.
+By default, the plugin keeps the key in memory only while open. Disconnect pauses the connection and retains that in-memory key for Connect. The optional Remember setting saves it in Figma's local `clientStorage`, isolated by plugin ID and not synchronized in the document. This storage is not an encrypted vault and does not protect against someone who can inspect the local Figma profile. Unchecking Remember deletes the stored key; Forget pairing deletes it, clears memory and disconnects. Authentication rejection attempts to remove invalid saved credentials, with failures shown in the panel. [Figma storage guarantees](https://developers.figma.com/docs/plugins/api/figma-clientStorage/).
+
+`npm run pair` copies the key to the system clipboard; replace clipboard contents afterward. The bridge stores credentials, exported assets and mutation history in a private local state directory. On Windows, protect that directory with appropriate account filesystem permissions; Unix file modes do not establish Windows ACL protection.
 
 Host/origin filtering, schema validation and bounded requests supplement authentication. They do not make the service suitable for public-network exposure or hostile authenticated clients. Keep the bridge and optional Chrome debugging endpoint on loopback. The dedicated Chrome profile may contain login credentials and should remain private.
 

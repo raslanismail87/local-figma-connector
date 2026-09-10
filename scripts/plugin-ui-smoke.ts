@@ -29,8 +29,10 @@ const bridgeClient = new BridgeClient(`http://127.0.0.1:${bridgePort}`, token);
 const html = sourceHtml.split('ws://localhost:3845/plugin').join(`ws://localhost:${bridgePort}/plugin`);
 const parentScript = await build({ stdin: { contents: `
 import { requestSchema, documentSchema } from './src/protocol.js';
+import { pairingRequestSchema } from './plugin/pairing-protocol.js';
 const info = documentSchema.parse(${JSON.stringify(fixtureDocument)});
-window.fixtureState = { ready: 0, selections: 0, rejected: 0, messages: [] };
+let savedToken = null;
+window.fixtureState = { ready: 0, selections: 0, rejected: 0, messages: [], saved: false };
 window.addEventListener('message', event => {
   const frame = document.querySelector('iframe');
   if (event.source !== frame?.contentWindow) return;
@@ -39,6 +41,18 @@ window.addEventListener('message', event => {
   if (message?.type === 'ready') {
     window.fixtureState.ready++;
     frame.contentWindow.postMessage({ pluginMessage: { type: 'document', document: info } }, '*');
+    return;
+  }
+  const pairing = pairingRequestSchema.safeParse(message);
+  if (pairing.success) {
+    const { action, requestId } = pairing.data;
+    if (action === 'save') savedToken = pairing.data.token;
+    if (action === 'forget') savedToken = null;
+    window.fixtureState.saved = savedToken !== null;
+    frame.contentWindow.postMessage({ pluginMessage: {
+      type: 'pairing-result', requestId, action, ok: true,
+      ...(action === 'load' ? { token: savedToken } : {})
+    } }, '*');
     return;
   }
   const parsed = requestSchema.safeParse(message);
@@ -96,7 +110,7 @@ try {
   page.on('pageerror', error => { pageErrors.push(error.message); process.stderr.write(`Fixture page error: ${error.message}\n`); });
   page.on('request', request => urls.push(request.url()));
   page.on('websocket', socket => urls.push(socket.url()));
-  await page.setViewportSize({ width: 320, height: 380 });
+  await page.setViewportSize({ width: 320, height: 470 });
   await page.goto(`http://127.0.0.1:${address.port}/`, { waitUntil: 'load' });
   page.setDefaultTimeout(8000);
   const ui = page.frameLocator('iframe');
@@ -130,9 +144,9 @@ try {
   if (response.ok) assert.deepEqual(response.data, fixtureDocument);
   checks.push('Enter-key pairing with real authenticated bridge session and selection RPC → compiled UI → validated simulated parent → UI → bridge response');
   await page.screenshot({ path: join(output, 'connected-320.png') });
-  await page.setViewportSize({ width: 280, height: 380 });
+  await page.setViewportSize({ width: 280, height: 470 });
   await page.screenshot({ path: join(output, 'connected-280.png') });
-  await page.setViewportSize({ width: 320, height: 380 });
+  await page.setViewportSize({ width: 320, height: 470 });
   await bridge.close();
   bridge = undefined;
   await ui.locator('#status').filter({ hasText: 'Bridge unavailable' }).waitFor();
@@ -154,8 +168,10 @@ try {
   await waitUntil(async () => (await sessions()).length === 0, 'disconnect removes bridge session');
   assert.equal(await ui.getByLabel('Pairing token', { exact: true }).inputValue(), '');
   await ui.getByRole('button', { name: 'Connect', exact: true }).click();
-  await ui.locator('#status').filter({ hasText: 'Paste the 64-character token' }).waitFor();
-  checks.push('disconnect clears session and in-memory token; reconnect requires a fresh token');
+  await ui.locator('#status').filter({ hasText: 'Connected · ready for Codex' }).waitFor();
+  await ui.getByRole('button', { name: 'Disconnect', exact: true }).click();
+  await waitUntil(async () => (await sessions()).length === 0, 'second disconnect pauses the session');
+  checks.push('Disconnect pauses the current runtime and Connect resumes without key entry');
   const storageState = await context.storageState();
   assert.equal(JSON.stringify(storageState).includes(token), false);
   assert.equal(urls.some(url => url.includes(token) || url.includes(wrongToken)), false);
@@ -169,7 +185,78 @@ try {
   assert.equal(parentState.selections, 2);
   assert.equal(parentState.rejected, 0);
   assert.equal(parentState.messages.some(message => message.includes(token) || message.includes(wrongToken)), false);
-  checks.push('pairing token absent from URLs, browser storage, and parent relay messages; iframe storage unavailable by sandbox');
+  checks.push('without remembered pairing, token is absent from URLs, browser storage, and parent relay messages');
+
+  const saved = () => page.evaluate(() => (window as unknown as { fixtureState: { saved: boolean } }).fixtureState.saved);
+  await ui.getByLabel('Pairing token', { exact: true }).fill(token);
+  await ui.locator('#remember').check();
+  await ui.getByRole('button', { name: 'Connect', exact: true }).click();
+  await ui.locator('#status').filter({ hasText: 'Connected · ready for Codex' }).waitFor();
+  await waitUntil(saved, 'successful opt-in pairing is saved');
+  const [rememberedSession] = await sessions();
+  await page.screenshot({ path: join(output, 'remembered-320.png') });
+  await frame.goto(frame.url());
+  await ui.locator('#status').filter({ hasText: 'Connected · ready for Codex' }).waitFor();
+  await waitUntil(async () => {
+    const current = await sessions();
+    return current.length === 1 && current[0].instanceId !== rememberedSession.instanceId;
+  }, 'fresh plugin UI automatically pairs using remembered key');
+  assert.equal(await ui.locator('#remember').isChecked(), true);
+  assert.equal(await ui.getByLabel('Pairing token', { exact: true }).inputValue(), '');
+  checks.push('opt-in pairing survives a new UI runtime and reconnects without key entry');
+
+  await ui.getByRole('button', { name: 'Disconnect', exact: true }).click();
+  await waitUntil(async () => (await sessions()).length === 0, 'remembered disconnect removes session');
+  assert.equal(await saved(), true);
+  await ui.getByRole('button', { name: 'Connect', exact: true }).click();
+  await ui.locator('#status').filter({ hasText: 'Connected · ready for Codex' }).waitFor();
+  checks.push('Disconnect pauses while saved pairing supports Connect without retyping');
+
+  await ui.locator('#remember').uncheck();
+  await waitUntil(async () => !(await saved()), 'unchecking remember removes stored pairing');
+  assert.equal((await sessions()).length, 1);
+  await frame.goto(frame.url());
+  await ui.locator('#document').filter({ hasText: fixtureDocument.name }).waitFor();
+  await waitUntil(async () => (await sessions()).length === 0, 'unsaved reload stays disconnected');
+  assert.equal(await ui.locator('#remember').isChecked(), false);
+  checks.push('unchecking remember removes persisted key without interrupting the active connection');
+
+  await ui.getByLabel('Pairing token', { exact: true }).fill(token);
+  await ui.locator('#remember').check();
+  await ui.getByRole('button', { name: 'Connect', exact: true }).click();
+  await ui.locator('#status').filter({ hasText: 'Connected · ready for Codex' }).waitFor();
+  await waitUntil(saved, 'pairing saved before forget check');
+  await ui.locator('#forget').click();
+  await waitUntil(async () => !(await saved()) && (await sessions()).length === 0, 'Forget removes stored key and disconnects');
+  await frame.goto(frame.url());
+  await ui.locator('#document').filter({ hasText: fixtureDocument.name }).waitFor();
+  assert.equal((await sessions()).length, 0);
+  await ui.getByRole('button', { name: 'Connect', exact: true }).click();
+  await ui.locator('#status').filter({ hasText: 'Paste the 64-character token' }).waitFor();
+  checks.push('Forget pairing clears storage and memory and prevents automatic pairing after reload');
+
+  await ui.getByLabel('Pairing token', { exact: true }).fill(token);
+  await ui.locator('#remember').check();
+  await ui.getByRole('button', { name: 'Connect', exact: true }).click();
+  await ui.locator('#status').filter({ hasText: 'Connected · ready for Codex' }).waitFor();
+  await waitUntil(saved, 'pairing saved before rejection check');
+  await bridge.close();
+  bridge = await startBridge({ token: wrongToken, port: bridgePort, timeoutMs: 5000 });
+  await ui.locator('#status').filter({ hasText: 'Pairing rejected' }).waitFor({ timeout: 10000 });
+  await waitUntil(async () => !(await saved()), 'rejected stored pairing is removed');
+  assert.equal(await ui.getByLabel('Pairing token', { exact: true }).isEnabled(), true);
+  assert.equal(await ui.locator('#remember').isChecked(), false);
+  checks.push('authentication rejection clears stale remembered pairing instead of retrying it indefinitely');
+
+  const rememberedMessages = await page.evaluate(() => (window as unknown as { fixtureState: { messages: string[] } }).fixtureState.messages);
+  for (const serialized of rememberedMessages.filter(message => message.includes(token))) {
+    const message = JSON.parse(serialized);
+    assert.equal(message.type, 'pairing');
+    assert.equal(message.action, 'save');
+  }
+  assert.equal(JSON.stringify(await context.storageState()).includes(token), false);
+  assert.equal(urls.some(url => url.includes(token) || url.includes(wrongToken)), false);
+  checks.push('opt-in keys cross only the typed save channel; browser storage and URLs remain free of keys');
   await bridge.close();
   bridge = undefined;
   const longMessage = 'Pairing failed. A different local bridge is running. Run npm run pair in the connector folder, paste the current token, and connect again.';
@@ -191,7 +278,7 @@ try {
   assert.equal(await ui.getByLabel('Pairing token', { exact: true }).isEnabled(), true);
   assert.equal(await ui.getByRole('button', { name: 'Disconnect', exact: true }).isDisabled(), true);
   await page.screenshot({ path: join(output, 'protocol-error-320.png') });
-  await page.setViewportSize({ width: 280, height: 380 });
+  await page.setViewportSize({ width: 280, height: 470 });
   await page.screenshot({ path: join(output, 'protocol-error-280.png') });
   const narrowLayout = await frame.evaluate(() => ({ width: innerWidth, scrollWidth: document.documentElement.scrollWidth, height: innerHeight, scrollHeight: document.documentElement.scrollHeight }));
   assert.equal(narrowLayout.scrollWidth <= narrowLayout.width, true, 'Pairing UI must not scroll horizontally at 280px.');

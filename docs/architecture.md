@@ -56,3 +56,9 @@ On `OUTCOME_UNCERTAIN`, inspect `figma_request_status` and the affected document
 - **Uncertain edit:** stop automatic mutation retries and inspect the durable status and document.
 
 The plugin must stay open. Exported files, browser profiles and the mutation journal live outside source control and can contain private design data.
+
+## Remembered pairing
+
+Persistence is opt-in and independent of document commands. The UI sends strict, UUID-correlated load/save/forget messages to a serialized `figma.clientStorage` adapter. Separate UI revisions prevent late responses from overwriting manual input or undoing a newer preference. Only successful authentication triggers a save. Forget clears memory and disconnects before requesting deletion; failures are visible and can be retried. Reopening may restore the connection, but never replays document mutations.
+
+Figma storage requires a stable plugin ID. The setup helper extracts only the ID from a Figma-generated manifest into ignored local configuration; the build retains the connector's own network and document permissions. Storage is local to the plugin ID, outside design files, and is not an encrypted vault. See the README for setup and removal behavior.

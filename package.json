@@ -17,6 +17,7 @@
   "type": "module",
   "engines": { "node": ">=20.19" },
   "scripts": {
+    "plugin:configure": "tsx scripts/plugin-config.ts",
     "build": "tsx scripts/build.ts",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/*.test.ts",
