@@ -8,8 +8,8 @@ Host/origin filtering, schema validation and bounded requests supplement authent
 
 ## Reporting a vulnerability
 
-Do not publish pairing keys, private design data or a working exploit against another user's setup. This local repository has no hosted reporting channel yet. Once hosted, use a private security advisory if the project enables one, or a private maintainer contact explicitly provided by that project. No private email address or advisory service is assumed to exist.
+Use [GitHub private vulnerability reporting](https://github.com/raslanismail87/local-figma-connector/security/advisories/new) to report security issues privately. Do not publish pairing keys, private design data or exploit details in public issues.
 
-Prepare a minimal reproduction using a disposable design and a fresh local state directory. Include the affected version, operating system, expected boundary and observed behavior, with secrets removed. If no private channel exists, retain exploit details locally and ask the maintainer for a private reporting method without disclosing them publicly.
+Prepare a minimal reproduction using a disposable design and a fresh local state directory. Include the affected version, operating system, expected boundary and observed behavior, with secrets removed. If the private reporting form is unavailable, ask the maintainer for a private reporting method without disclosing exploit details publicly.
 
 No response-time or supported-version policy has been established for this initial release.

@@ -8,7 +8,7 @@ A clean export containing only the files intended for Git was installed with `np
 
 Five platform-helper tests cover executable discovery, paths with spaces, explicit overrides, clipboard fallback and secret-free error reporting. The final platform path correction passed these tests and typechecking. The updated Chrome smoke also passed all nine browser tools on macOS with Chrome 152.0.7977.83.
 
-The Git candidate files were checked for the live pairing credential, personal installation paths and generated/private directories; none were included. CI YAML was parsed locally and configures Node 20.19, 22 and 24 on Linux, plus Node 24 on macOS and Windows. Hosted CI has not run because the repository has not been pushed. Windows and Linux helpers are implemented and have targeted simulated coverage; neither OS received live desktop validation.
+The Git candidate files were checked for the live pairing credential, personal installation paths and generated/private directories; none were included. CI YAML was parsed locally and configures Node 20.19, 22 and 24 on Linux, plus Node 24 on macOS and Windows. Hosted CI was not run during the original local preparation; current runs are available in [GitHub Actions](https://github.com/raslanismail87/local-figma-connector/actions). Windows and Linux helpers are implemented and have targeted simulated coverage; neither OS received live desktop validation.
 
 ## Automated checks
 

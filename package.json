@@ -4,6 +4,14 @@
   "description": "Authenticated local MCP bridge for inspecting and editing Figma through a custom desktop plugin.",
   "license": "MIT",
   "author": "Raslan Ismail",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raslanismail87/local-figma-connector.git"
+  },
+  "homepage": "https://github.com/raslanismail87/local-figma-connector#readme",
+  "bugs": {
+    "url": "https://github.com/raslanismail87/local-figma-connector/issues"
+  },
   "keywords": ["figma", "mcp", "codex", "plugin", "local-first"],
   "private": true,
   "type": "module",

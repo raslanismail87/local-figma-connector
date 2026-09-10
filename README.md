@@ -1,5 +1,7 @@
 # Local Figma connector for Codex
 
+Free and open source under the [MIT license](LICENSE).
+
 A local TypeScript MCP server and custom Figma Design plugin. Inspect selections and node trees, create or update frames/text/shapes/components, and export PNG previews or SVG files. There is no hosted backend, connector subscription, REST API token, or dependency on Figma's official MCP service. Normal Codex usage remains separate. The connector works with any editable Figma Design file in which you run its plugin; it is not tied to one project, account, or design system.
 
 **Local development plugins require Figma desktop.** The free Starter plan supports this workflow. Chrome is an optional browser-control adapter; this unpublished plugin cannot be imported into Chrome using Figma's supported local development workflow. See [verified platform references](docs/official-references.md) for Community review restrictions and browser networking constraints.
@@ -9,7 +11,8 @@ A local TypeScript MCP server and custom Figma Design plugin. Inspect selections
 Requirements: Node.js 20.19 or newer, npm, Figma desktop, and an editable Figma Design file. The complete workflow has been tested on macOS. Figma Desktop is available for macOS and Windows; Windows setup has not been live validated here. Linux can run the server and browser checks, but does not provide the supported local Figma Desktop workflow.
 
 ```sh
-# From your local checkout of this repository:
+git clone https://github.com/raslanismail87/local-figma-connector.git
+cd local-figma-connector
 npm ci
 npm run build
 npm run setup

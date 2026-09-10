@@ -1,6 +1,6 @@
 # Contributing
 
-This project welcomes focused fixes, compatibility evidence and improvements to its typed Figma tools. Discuss substantial feature changes before broad refactors once a project discussion channel is available.
+This project welcomes focused fixes, compatibility evidence and improvements to its typed Figma tools. Use [GitHub issues](https://github.com/raslanismail87/local-figma-connector/issues) for bugs, compatibility reports and substantial feature proposals before broad refactors. Report security issues through the private channel in [SECURITY.md](SECURITY.md).
 
 ## Develop locally
 
