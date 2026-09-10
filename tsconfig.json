@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "target": "ES2020", "module": "NodeNext", "moduleResolution": "NodeNext",
+    "lib": ["ES2020", "DOM"], "strict": true, "noEmit": true,
+    "esModuleInterop": true, "skipLibCheck": true,
+    "types": ["node", "@figma/plugin-typings"]
+  },
+  "include": ["src/**/*.ts", "plugin/**/*.ts", "scripts/**/*.ts", "tests/**/*.ts"]
+}

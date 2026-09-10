@@ -1,0 +1,12 @@
+{
+  "name": "Local Figma Connector",
+  "api": "1.0.0",
+  "main": "main.js",
+  "ui": "ui.html",
+  "editorType": ["figma"],
+  "documentAccess": "dynamic-page",
+  "networkAccess": {
+    "allowedDomains": ["none"],
+    "devAllowedDomains": ["ws://localhost:3845"]
+  }
+}

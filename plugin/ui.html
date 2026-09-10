@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root { font: 12px/1.5 Inter, system-ui, sans-serif; color: var(--figma-color-text, #242424); background: var(--figma-color-bg, #fff); }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 20px; }
+    h1 { font-size: 15px; line-height: 1.4; margin: 0 0 6px; font-weight: 600; }
+    p { margin: 0; }
+    .intro, .hint { color: var(--figma-color-text-secondary, #666); }
+    .intro { margin-bottom: 19px; }
+    label { display: block; font-weight: 500; margin-bottom: 6px; }
+    input { width: 100%; height: 34px; border: 1px solid var(--figma-color-border, #ccc); border-radius: 4px; background: var(--figma-color-bg, #fff); color: inherit; padding: 0 9px; font: inherit; }
+    input:focus-visible, button:focus-visible { outline: 2px solid var(--figma-color-border-brand-strong, #0d78e8); outline-offset: 2px; }
+    .hint { font-size: 11px; margin-top: 6px; }
+    .actions { display: flex; gap: 8px; margin: 16px 0; }
+    button { height: 32px; border: 1px solid var(--figma-color-border, #ccc); border-radius: 4px; padding: 0 13px; background: var(--figma-color-bg, #fff); color: inherit; font: 500 12px Inter, system-ui, sans-serif; cursor: pointer; }
+    button.primary { background: var(--figma-color-bg-brand, #0d78e8); border-color: transparent; color: var(--figma-color-text-onbrand, #fff); }
+    button:disabled { opacity: .5; cursor: default; }
+    .connection { border-top: 1px solid var(--figma-color-border, #e5e5e5); padding-top: 13px; }
+    .status-line { display: flex; align-items: flex-start; gap: 7px; }
+    #dot { width: 6px; height: 6px; flex: 0 0 6px; margin-top: 6px; border-radius: 50%; background: var(--figma-color-icon-secondary, #888); }
+    #dot[data-state="connected"] { background: var(--figma-color-bg-success, #198f51); }
+    #dot[data-state="error"] { background: var(--figma-color-bg-danger, #d92e32); }
+    #document { color: var(--figma-color-text-secondary, #666); font-size: 11px; margin: 5px 0 0 13px; overflow-wrap: anywhere; }
+  </style>
+</head>
+<body>
+  <h1>Local Figma Connector</h1>
+  <p class="intro">Start <code>npm run bridge</code>, then copy the key with <code>npm run pair</code>.</p>
+  <form id="connection-form">
+    <label for="token">Pairing token</label>
+    <input id="token" type="password" autocomplete="off" spellcheck="false" placeholder="Paste the token from npm run pair" aria-describedby="token-hint">
+    <p class="hint" id="token-hint">Kept only while this plugin is open.</p>
+    <div class="actions">
+      <button class="primary" id="connect" type="button">Connect</button>
+      <button id="disconnect" type="button" disabled>Disconnect</button>
+    </div>
+  </form>
+  <div class="connection" role="status" aria-live="polite">
+    <div class="status-line"><span id="dot" aria-hidden="true"></span><span id="status">Disconnected</span></div>
+    <p id="document">Waiting for the current file…</p>
+  </div>
+  <script><!-- SCRIPT --></script>
+</body>
+</html>

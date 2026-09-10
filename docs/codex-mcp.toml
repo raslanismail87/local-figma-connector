@@ -1,0 +1,9 @@
+[mcp_servers.local_figma]
+command = "/absolute/path/to/node"
+args = ["/absolute/path/to/figma-connector/dist/mcp.js"]
+startup_timeout_sec = 10
+tool_timeout_sec = 45
+
+# Optional; start npm run chrome:launch first, then reload the MCP connection.
+# [mcp_servers.local_figma.env]
+# FIGMA_CONNECTOR_CDP_URL = "http://127.0.0.1:9222"

@@ -1,0 +1,40 @@
+{
+  "name": "local-figma-connector",
+  "version": "1.0.0",
+  "description": "Authenticated local MCP bridge for inspecting and editing Figma through a custom desktop plugin.",
+  "license": "MIT",
+  "author": "Raslan Ismail",
+  "keywords": ["figma", "mcp", "codex", "plugin", "local-first"],
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20.19" },
+  "scripts": {
+    "build": "tsx scripts/build.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts",
+    "check": "npm run typecheck && npm test && npm run build",
+    "setup": "tsx src/cli.ts setup",
+    "config:codex": "tsx scripts/codex-config.ts",
+    "pair": "tsx src/cli.ts pair",
+    "bridge": "node dist/bridge.js",
+    "mcp": "node dist/mcp.js",
+    "smoke:live": "tsx scripts/live-smoke.ts",
+    "smoke:chrome": "tsx scripts/chrome-smoke.ts",
+    "smoke:ui": "tsx scripts/plugin-ui-smoke.ts",
+    "chrome:launch": "tsx scripts/chrome-launch.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.30.0",
+    "playwright-core": "1.63.0",
+    "ws": "^8.18.0",
+    "zod": "4.6.0"
+  },
+  "devDependencies": {
+    "@figma/plugin-typings": "1.138.0",
+    "@types/node": "^22.0.0",
+    "@types/ws": "^8.18.0",
+    "esbuild": "^0.25.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  }
+}
