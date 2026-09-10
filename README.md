@@ -2,7 +2,7 @@
 
 A local TypeScript MCP server and custom Figma Design plugin. Inspect selections and node trees, create or update frames/text/shapes/components, and export PNG previews or SVG files. There is no hosted backend, connector subscription, REST API token, or dependency on Figma's official MCP service. Normal Codex usage remains separate. The connector works with any editable Figma Design file in which you run its plugin; it is not tied to one project, account, or design system.
 
-**Local development plugins require Figma desktop.** The free Starter plan supports this workflow. Chrome is an optional browser-control adapter; this unpublished plugin cannot be imported into Chrome using Figma's supported local development workflow. See [verified platform references](docs/official-references.md) for the future Community distribution route and current browser networking constraints.
+**Local development plugins require Figma desktop.** The free Starter plan supports this workflow. Chrome is an optional browser-control adapter; this unpublished plugin cannot be imported into Chrome using Figma's supported local development workflow. See [verified platform references](docs/official-references.md) for Community review restrictions and browser networking constraints.
 
 ## Quick start
 
@@ -83,7 +83,7 @@ FIGMA_CONNECTOR_CDP_URL = "http://127.0.0.1:9222"
 
 Chrome tools list/open/select/navigate tabs, inspect accessibility snapshots, operate visible controls by selector or role/name, use coordinates and keyboard shortcuts, and capture PNG screenshots. The adapter does not expose browser JavaScript evaluation. Use the Plugin API tools for structured Figma edits. Plugin functionality does not require Chrome.
 
-Public Community publication is a possible future distribution route for running the plugin in Chrome; this repository currently supplies a development plugin only. A published version would also need production network permissions and actual validation of Chrome Local Network Access inside Figma's iframe. Publication alone is not proof that localhost WebSockets will be allowed. [Details and official sources](docs/official-references.md).
+This repository supplies a development plugin. Figma's current Community review guidelines say it generally does not approve plugins providing programmatic AI access outside its official MCP server, which matches this connector's design. Community publication should therefore not be treated as an available distribution route without explicit acceptance from Figma or a policy change. Browser-hosted localhost networking is separately unverified. [Details and official sources](docs/official-references.md).
 
 ## Validation
 

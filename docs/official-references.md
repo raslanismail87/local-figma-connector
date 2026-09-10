@@ -1,6 +1,6 @@
 # Official compatibility references
 
-Verified on **2026-09-09** against the primary sources linked below. These are platform requirements and implementation implications. Actual Desktop and Chrome validation is recorded separately in [validation.md](validation.md).
+Platform references checked on **2026-09-09**; Community review eligibility corrected on **2026-09-10**. These are platform requirements and implementation implications. Actual Desktop and Chrome validation is recorded separately in [validation.md](validation.md).
 
 ## Free-plan operation and browser limits
 
@@ -8,9 +8,11 @@ Classic plugins run in Figma Design on the Starter plan. Creating a development 
 
 Figma's supported local plugin development and testing workflow requires the desktop app because it reads plugin files from disk. Import the built manifest through **Plugins → Development → Import new plugin from manifest** in Desktop. The official documentation provides no supported route to import and run this unpublished local plugin directly in Chrome. The practical unpublished workflow is to run the connector in Desktop and view the same synchronized document in Chrome. This last workflow is an implementation recommendation; verify synchronization in the actual document. [Plugin quickstart](https://developers.figma.com/docs/plugins/plugin-quickstart-guide/).
 
-### Possible future Community release
+### Community review restriction
 
-Publishing a free classic plugin to the public Figma Community is supported on any plan. Submission requires Desktop, a development plugin, two-factor authentication, listing details, and Figma review. After approval, the Community listing provides the normal distribution route for users to run the plugin, including from the browser editor. This is a future route only: **this project does not submit, publish, or promise approval**. Private organization publishing is restricted to Organization and Enterprise plans. [Community publishing](https://help.figma.com/hc/en-us/articles/360042293394-Publish-classic-plugins-to-the-Figma-Community), [running plugins](https://help.figma.com/hc/en-us/articles/360042532714-Use-plugins-in-files), [internal plugins](https://help.figma.com/hc/en-us/articles/4404228629655-Create-internal-plugins-for-an-organization).
+Publishing free classic plugins is generally supported on any plan and requires Desktop, two-factor authentication and Figma review. Plan eligibility does not establish acceptance of this connector. [Community publishing](https://help.figma.com/hc/en-us/articles/360042293394-Publish-classic-plugins-to-the-Figma-Community).
+
+The current review guidelines specifically say Figma generally does not approve plugins exposing MCP or providing programmatic AI access to files outside its official MCP server. This directly matches our architecture. Treat Community distribution as blocked by the current review policy unless Figma explicitly accepts the integration or changes its policy; changing the network manifest does not address this restriction. This finding concerns Community review and does not establish whether local use or source distribution is permitted under every applicable term. [Plugin and widget review guidelines](https://help.figma.com/hc/en-us/articles/360039958914-Plugin-and-widget-review-guidelines).
 
 Public distribution alone does not establish that a localhost bridge works in Chrome. The production manifest and browser networking behavior require separate validation below.
 

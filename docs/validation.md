@@ -67,7 +67,7 @@ The smoke requires the document name to match and requires an explicit session w
 - Live coverage uses one document and one plugin session. Normal Undo, page changes and simultaneous live sessions are not established by the smoke report; automated tests cover the corresponding supported request and recovery behavior.
 - The plugin must remain open. Sessions are live runtime connections, not a catalog of every Figma file.
 - Supported edits are deliberately typed and limited; unsupported operations fail explicitly. Rich text ranges, vectors, component variants, image fills and other omitted APIs are outside this version.
-- Browser support is complementary. A future published plugin would require Figma review plus separate Chrome iframe/networking tests under normal browser security settings.
+- Browser support is complementary. Current Figma Community review guidelines generally exclude this MCP architecture; see the platform references. Browser-hosted localhost networking is also unverified.
 - Mutation deduplication relies on retaining the private state directory and journal. It is not a distributed transaction or a power-loss guarantee. Figma can partially apply a multi-property edit.
 - macOS is the exercised setup target. Cross-platform helper behavior is described in the README; Windows and Linux have not received the same live editor validation.
 

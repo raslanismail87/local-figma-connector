@@ -10,4 +10,4 @@
 - Documented runtime fixes and validation limits from Figma Desktop 126.8.18 on macOS.
 - Portable Codex configuration generation, Chrome discovery and clipboard helpers; MIT licensing, bundled dependency notices, contributor guidance and CI configuration.
 
-The initial live editor validation used a Professional workspace. Starter compatibility is documented by Figma but was not tested on a Starter account. Community publication and browser-hosted plugin networking remain unverified.
+The initial live editor validation used a Professional workspace. Starter compatibility is documented by Figma but was not tested on a Starter account. Current Community review guidelines generally exclude this MCP architecture; browser-hosted plugin networking remains unverified.
